@@ -1,5 +1,5 @@
 /*
- * 此项目已在个Github开源
+ * 此项目已在Github开源
  * 项目地址:https://github.com/OxiaozhaiO/IMS
  */
 #include <iostream>

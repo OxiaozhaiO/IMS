@@ -226,7 +226,7 @@ int main()
                 ims.updatePrice(name, price);
                 break;
             case 7:
-                cout << "已退出程序..."<< endl;
+                cout << "已退出程序...\n(按任意键退出)"<< endl;
                 break;
             default:
                 cout << "没有这个选项" << endl;

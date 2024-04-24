@@ -44,7 +44,6 @@ public:
             if (product.name != name) temp.push(product);
 			else cout << "已删除: " << name << endl;
         }
-
         while (!temp.empty()) //将数据放回原栈
 		{
             inventory.push(temp.top());
@@ -54,12 +53,10 @@ public:
 	//显示库存函数
     void displayInventory() 
 	{
-#ifdef _WIN32
-		system("cls");
-#elif __linux__
-		system("clear");
-#endif
         cout << "当前库存:" << endl;
+		if(inventory.empty())cout<<"-----------\n";
+		else cout<<"==\n";
+
         stack<Product> temp;//建立temp栈保存数据
         while (!inventory.empty()) 
 		{
@@ -69,13 +66,14 @@ public:
                  << ", 标签: " << product.label << ", 数量: " << product.quantity
                  << ", 价格: " << product.price << endl;
             temp.push(product);
-        }
 
+        }
         while (!temp.empty()) //放回原栈中
 		{
             inventory.push(temp.top());
             temp.pop();
         }
+		if(!inventory.empty()) cout<<"==\n";
     }
 	//购买产品到库函数
     void purchaseProduct(string& name, int quantity) 
@@ -154,14 +152,14 @@ public:
 void printMenu() 
 {
     cout << "====超市进销管理系统====" << endl;
-    cout << "1. 添加产品" << endl;
-    cout << "2. 删除产品" << endl;
-    cout << "3. 显示产品" << endl;
-    cout << "4. 购买产品" << endl;
-    cout << "5. 售出产品" << endl;
-    cout << "6. 更新价格" << endl;
-    cout << "7. 退出" << endl;
-    cout << "输入序号:";
+    cout << "      1.添加产品" << endl;
+    cout << "      2.删除产品" << endl;
+    cout << "      3.显示产品" << endl;
+    cout << "      4.购买产品" << endl;
+    cout << "      5.售出产品" << endl;
+    cout << "      6.更新价格" << endl;
+    cout << "      7.退出" << endl;
+    cout << "========================" << endl;
 }
 
 int main() 
@@ -173,7 +171,6 @@ int main()
     double price;
 
     do {
-
 /*	
  *	这边用宏判断是linux还是windows
  *	我这边用的是linux
@@ -183,8 +180,9 @@ int main()
 #elif __linux__
 		system("clear");
 #endif
-
         printMenu();
+		ims.displayInventory();
+    	cout << "输入序号:";
         cin >> choice;
         switch (choice)
 	   	{
@@ -231,8 +229,8 @@ int main()
                 ims.updatePrice(name, price);
                 break;
             case 7:
-                cout << "已退出程序...\n(按任意键退出)"<< endl;
-                break;
+                cout << "已退出程序...\n"<< endl;
+				exit(0);
             default:
                 cout << "没有这个选项" << endl;
                 break;
@@ -243,4 +241,3 @@ int main()
 
     return 0;
 }
-

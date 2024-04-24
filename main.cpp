@@ -17,7 +17,7 @@ struct Product
     int quantity;
     double price;
 
-    Product(const string& n, const string& c, const string& l, int q, double p)
+    Product(string& n, string& c, string& l, int q, double p)
         : name(n), category(c), label(l), quantity(q), price(p) {}
 };
 
@@ -28,13 +28,13 @@ private:
     stack<Product> inventory;
 public:
 	//添加产品函数
-    void addProduct(const string& name, const string& category, const string& label, int quantity, double price) 
+    void addProduct(string& name, string& category, string& label, int quantity, double price) 
 	{
         inventory.push(Product(name, category, label, quantity, price));
         cout << "添加了: " << name<< endl;
     }
 	//删除产品函数
-    void removeProduct(const string& name) 
+    void removeProduct(string& name) 
 	{
         stack<Product> temp;//遍历栈需要pop, 所以防止数据丢失建立temp栈保存
         while (!inventory.empty()) 
@@ -54,6 +54,11 @@ public:
 	//显示库存函数
     void displayInventory() 
 	{
+#ifdef _WIN32
+		system("cls");
+#elif __linux__
+		system("clear");
+#endif
         cout << "当前库存:" << endl;
         stack<Product> temp;//建立temp栈保存数据
         while (!inventory.empty()) 
@@ -73,7 +78,7 @@ public:
         }
     }
 	//购买产品到库函数
-    void purchaseProduct(const string& name, int quantity) 
+    void purchaseProduct(string& name, int quantity) 
 	{
         stack<Product> temp;
         while (!inventory.empty()) 
@@ -95,7 +100,7 @@ public:
         }
     }
 	//产品售出函数
-    void sellProduct(const string& name, int quantity) 
+    void sellProduct(string& name, int quantity) 
 	{
         stack<Product> temp;
         while (!inventory.empty()) 
@@ -123,7 +128,7 @@ public:
         }
     }
 	//更新价格函数
-    void updatePrice(const string& name, double price) 
+    void updatePrice(string& name, double price) 
 	{
         stack<Product> temp;
         while (!inventory.empty()) 
@@ -171,7 +176,7 @@ int main()
 
 /*	
  *	这边用宏判断是linux还是windows
- *	我用的是linux系统,方便我调试
+ *	我这边用的是linux
 */
 #ifdef _WIN32
 		system("cls");
@@ -221,7 +226,7 @@ int main()
             case 6:
                 cout << "输入要更新价格的产品名:";
                 cin >> name;
-                cout << "输入新价格";
+                cout << "输入新价格:";
                 cin >> price;
                 ims.updatePrice(name, price);
                 break;

@@ -2,10 +2,10 @@
  * 此项目已在Github开源
  * 项目地址:https://github.com/OxiaozhaiO/IMS
  */
-#include <iostream>
-#include <stack>
-#include <string>
-#include <vector>
+#include<iostream>
+#include<stack>
+#include<string>
+#include<vector>
 
 /*
  * 我需要getch函数，但linux没有，所以需要自己实现
@@ -14,13 +14,13 @@
  * 如果是windows就用conio里面的getch
  */
 #ifdef __linux__
-#include <unistd.h>
-#include <termio.h>
-#include <fcntl.h>
+#include<unistd.h>
+#include<termio.h>
+#include<fcntl.h>
 int getch();
 
 #elif _WIN32
-#include <conio.h>
+#include<conio.h>
 
 #endif
 
@@ -34,9 +34,7 @@ struct Product
     string label;
     int quantity;
     double price;
-
-    Product(string& n, string& c, string& l, int q, double p)
-        : name(n), category(c), label(l), quantity(q), price(p) {}
+    Product(string& n, string& c, string& l, int q, double p):name(n), category(c), label(l), quantity(q), price(p) {}
 };
 
 class IMS
@@ -49,20 +47,20 @@ public:
     void addProduct(string& name, string& category, string& label, int quantity, double price) 
 	{
         inventory.push(Product(name, category, label, quantity, price));
-        cout << "添加了: " << name<< endl;
+        cout<<"添加了: "<<name<<endl;
     }
 	//删除产品函数
     void removeProduct(string& name) 
 	{
         stack<Product> temp;//遍历栈需要pop, 所以防止数据丢失建立temp栈保存
-        while (!inventory.empty()) 
+        while(!inventory.empty()) 
 		{
             Product product = inventory.top();
             inventory.pop();
-            if (product.name != name) temp.push(product);
-			else cout << "已删除: " << name << endl;
+            if(product.name != name) temp.push(product);
+			else cout<<"已删除: "<<name<<endl;
         }
-        while (!temp.empty()) //将数据放回原栈
+        while(!temp.empty()) //将数据放回原栈
 		{
             inventory.push(temp.top());
             temp.pop();
@@ -71,22 +69,22 @@ public:
 	//显示库存函数
     void displayInventory() 
 	{
-        cout << "当前库存:" << endl;
+        cout<<"当前库存:"<<endl;
 		if(inventory.empty())cout<<"-----------\n";
 		else cout<<"==\n";
 
         stack<Product> temp;//建立temp栈保存数据
-        while (!inventory.empty()) 
+        while(!inventory.empty()) 
 		{
             Product product = inventory.top();
             inventory.pop();
-            cout << "名字: " << product.name << ", 类别: " << product.category
-                 << ", 标签: " << product.label << ", 数量: " << product.quantity
-                 << ", 价格: " << product.price << endl;
+            cout<<"名字: "<<product.name<<", 类别: "<<product.category
+                 <<", 标签: "<<product.label<<", 数量: "<<product.quantity
+                 <<", 价格: "<<product.price<<endl;
             temp.push(product);
 
         }
-        while (!temp.empty()) //放回原栈中
+        while(!temp.empty()) //放回原栈中
 		{
             inventory.push(temp.top());
             temp.pop();
@@ -97,19 +95,19 @@ public:
     void purchaseProduct(string& name, int quantity) 
 	{
         stack<Product> temp;
-        while (!inventory.empty()) 
+        while(!inventory.empty()) 
 		{
             Product product = inventory.top();
             inventory.pop();
-            if (product.name == name) 
+            if(product.name == name) 
 			{
                 product.quantity += quantity;
                 temp.push(product);
-                cout << "购买了" << quantity << "个" << name << endl;
+                cout<<"购买了"<<quantity<<"个"<<name<<endl;
             } else temp.push(product); 
         }
 
-        while (!temp.empty()) 
+        while(!temp.empty()) 
 		{
             inventory.push(temp.top());
             temp.pop();
@@ -119,25 +117,25 @@ public:
     void sellProduct(string& name, int quantity) 
 	{
         stack<Product> temp;
-        while (!inventory.empty()) 
+        while(!inventory.empty()) 
 		{
             Product product = inventory.top();
             inventory.pop();
-            if (product.name == name) 
+            if(product.name == name) 
 			{
-                if (product.quantity < quantity) 
+                if(product.quantity < quantity) 
 				{
-                    cout << name << " 数量不足!" << endl;
+                    cout<<name<<" 数量不足!"<<endl;
                     temp.push(product);
                     break;
                 }
                 product.quantity -= quantity;
                 temp.push(product);
-                cout << "已出售" << quantity << "个" << name << endl;
+                cout<<"已出售"<<quantity<<"个"<<name<<endl;
             } else temp.push(product);
         }
 
-        while (!temp.empty()) 
+        while(!temp.empty()) 
 		{
             inventory.push(temp.top());
             temp.pop();
@@ -147,19 +145,19 @@ public:
     void updatePrice(string& name, double price) 
 	{
         stack<Product> temp;
-        while (!inventory.empty()) 
+        while(!inventory.empty()) 
 		{
             Product product = inventory.top();
             inventory.pop();
-            if (product.name == name) 
+            if(product.name == name) 
 			{
                 product.price = price;
                 temp.push(product);
-                cout << name << " 的价格已改为" << price << endl;
-            } else temp.push(product);
+                cout<<name<<" 的价格已改为"<<price<<endl;
+            }else temp.push(product);
         }
 
-        while (!temp.empty()) 
+        while(!temp.empty()) 
 		{
             inventory.push(temp.top());
             temp.pop();
@@ -169,15 +167,15 @@ public:
 //打印主菜单
 void printMenu() 
 {
-    cout << "====超市进销管理系统====" << endl;
-	cout << "      "<<(nav==1?"*":" ")<<"添加产品" << endl;
-    cout << "      "<<(nav==2?"*":" ")<<"删除产品" << endl;
-    cout << "      "<<(nav==3?"*":" ")<<"购买产品" << endl;
-    cout << "      "<<(nav==4?"*":" ")<<"售出产品" << endl;
-    cout << "      "<<(nav==5?"*":" ")<<"更新价格" << endl;
-    cout << "      "<<(nav==6?"*":" ")<<"退出" << endl;
-	cout << "(w或s移动，空格进入模块)"<<endl;
-    cout << "========================" << endl;
+    cout<<"====超市进销管理系统===="<<endl;
+	cout<<"      "<<(nav==1?"*":" ")<<"添加产品"<<endl;
+    cout<<"      "<<(nav==2?"*":" ")<<"删除产品"<<endl;
+    cout<<"      "<<(nav==3?"*":" ")<<"购买产品"<<endl;
+    cout<<"      "<<(nav==4?"*":" ")<<"售出产品"<<endl;
+    cout<<"      "<<(nav==5?"*":" ")<<"更新价格"<<endl;
+    cout<<"      "<<(nav==6?"*":" ")<<"退出"<<endl;
+	cout<<"(w或s移动，空格进入模块)"<<endl;
+    cout<<"========================"<<endl;
 }
 
 int main() 
@@ -187,7 +185,7 @@ int main()
     string name, category, label;
     int quantity;
     double price;
-    do {
+    do{
 /*	
  *	这边用宏判断是linux还是windows
  *	我这边用的是linux系统
@@ -200,55 +198,55 @@ int main()
         printMenu();
 		ims.displayInventory();
 		char ch = getch();
-		if(ch == 'w') nav = nav-1==0?6:nav-1;
-		else if(ch == 's') nav = nav+1==7?1:nav+1;
+		if(ch == 'w') nav = nav-1 == 0? 6:nav-1;
+		else if(ch == 's') nav = nav+1 == 7? 1:nav+1;
 		if(ch == ' ')
-        switch (nav)
+        switch(nav)
 	   	{
             case 1:
-                cout << "输入产品名:";
-                cin >> name;
-                cout << "输入产品类别:";
-                cin >> category;
-                cout << "输入产品标签:";
-                cin >> label;
-                cout << "输入产品数量: ";
-                cin >> quantity;
-                cout << "输入产品价格:";
-                cin >> price;
+                cout<<"输入产品名:";
+                cin>>name;
+                cout<<"输入产品类别:";
+                cin>>category;
+                cout<<"输入产品标签:";
+                cin>>label;
+                cout<<"输入产品数量: ";
+                cin>>quantity;
+                cout<<"输入产品价格:";
+                cin>>price;
                 ims.addProduct(name, category, label, quantity, price);
                 break;
             case 2:
-                cout << "输入删除的产品名:";
-                cin >> name;
+                cout<<"输入删除的产品名:";
+                cin>>name;
                 ims.removeProduct(name);
                 break;
             case 3:
-                cout << "输入要购买的产品:";
-                cin >> name;
-                cout << "输入购买数量: ";
-                cin >> quantity;
+                cout<<"输入要购买的产品:";
+                cin>>name;
+                cout<<"输入购买数量: ";
+                cin>>quantity;
                 ims.purchaseProduct(name, quantity);
                 break;
             case 4:
-                cout << "输入出售的产品:";
-                cin >> name;
-                cout << "输入出售数量:";
-                cin >> quantity;
+                cout<<"输入出售的产品:";
+                cin>>name;
+                cout<<"输入出售数量:";
+                cin>>quantity;
                 ims.sellProduct(name, quantity);
                 break;
             case 5:
-                cout << "输入要更新价格的产品名:";
-                cin >> name;
-                cout << "输入新价格:";
-                cin >> price;
+                cout<<"输入要更新价格的产品名:";
+                cin>>name;
+                cout<<"输入新价格:";
+                cin>>price;
                 ims.updatePrice(name, price);
                 break;
             case 6:
-                cout << "已退出程序...\n"<< endl;
+                cout<<"已退出程序..."<<endl;
 				exit(0);
         }
-    } while (choice != 7);
+    } while(choice != 7);
 
     return 0;
 }
@@ -257,22 +255,20 @@ int getch(void)
 {
      struct termios tm, tm_old;
      int fd = 0, ch;
-
-     if (tcgetattr(fd, &tm) < 0) {//保存现在的终端设置
-          return -1;
-     }
+	//保存现在的终端设置
+     if (tcgetattr(fd, &tm) < 0) return -1;
 
      tm_old = tm;
-     cfmakeraw(&tm);//更改终端设置为原始模式，该模式下所有的输入数据以字节为单位被处理
-     if (tcsetattr(fd, TCSANOW, &tm) < 0) {//设置上更改之后的设置
-          return -1;
-     }
+
+	//更改终端设置为原始模式，该模式下所有的输入数据以字节为单位被处理
+     cfmakeraw(&tm);
+	//设置上更改之后的设置
+     if (tcsetattr(fd, TCSANOW, &tm) < 0) return -1;
 
      ch = getchar();
-     if (tcsetattr(fd, TCSANOW, &tm_old) < 0) {//更改设置为最初的样子
-          return -1;
-     }
 
+	//更改设置为最初的样子
+     if (tcsetattr(fd, TCSANOW, &tm_old) < 0) return -1;
      return ch;
 }
 #endif

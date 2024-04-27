@@ -7,7 +7,25 @@
 #include <string>
 #include <vector>
 
+/*
+ * 我需要getch函数，但linux没有，所以需要自己实现
+ * 这边判断是windows还是linux
+ * 如果是linux就用自己实现的getch
+ * 如果是windows就用conio里面的getch
+ */
+#ifdef __linux__
+#include <unistd.h>
+#include <termio.h>
+#include <fcntl.h>
+int getch();
+
+#elif _WIN32
+#include <conio.h>
+
+#endif
+
 using namespace std;
+int nav = 1;
 
 struct Product 
 {
@@ -152,13 +170,13 @@ public:
 void printMenu() 
 {
     cout << "====超市进销管理系统====" << endl;
-    cout << "      1.添加产品" << endl;
-    cout << "      2.删除产品" << endl;
-    cout << "      3.显示产品" << endl;
-    cout << "      4.购买产品" << endl;
-    cout << "      5.售出产品" << endl;
-    cout << "      6.更新价格" << endl;
-    cout << "      7.退出" << endl;
+	cout << "      "<<(nav==1?"*":" ")<<"添加产品" << endl;
+    cout << "      "<<(nav==2?"*":" ")<<"删除产品" << endl;
+    cout << "      "<<(nav==3?"*":" ")<<"购买产品" << endl;
+    cout << "      "<<(nav==4?"*":" ")<<"售出产品" << endl;
+    cout << "      "<<(nav==5?"*":" ")<<"更新价格" << endl;
+    cout << "      "<<(nav==6?"*":" ")<<"退出" << endl;
+	cout << "(w或s移动，空格进入模块)"<<endl;
     cout << "========================" << endl;
 }
 
@@ -169,7 +187,6 @@ int main()
     string name, category, label;
     int quantity;
     double price;
-
     do {
 /*	
  *	这边用宏判断是linux还是windows
@@ -182,9 +199,11 @@ int main()
 #endif
         printMenu();
 		ims.displayInventory();
-    	cout << "输入序号:";
-        cin >> choice;
-        switch (choice)
+		char ch = getch();
+		if(ch == 'w') nav = nav-1==0?6:nav-1;
+		else if(ch == 's') nav = nav+1==7?1:nav+1;
+		if(ch == ' ')
+        switch (nav)
 	   	{
             case 1:
                 cout << "输入产品名:";
@@ -205,39 +224,55 @@ int main()
                 ims.removeProduct(name);
                 break;
             case 3:
-                ims.displayInventory();
-                break;
-            case 4:
                 cout << "输入要购买的产品:";
                 cin >> name;
                 cout << "输入购买数量: ";
                 cin >> quantity;
                 ims.purchaseProduct(name, quantity);
                 break;
-            case 5:
+            case 4:
                 cout << "输入出售的产品:";
                 cin >> name;
                 cout << "输入出售数量:";
                 cin >> quantity;
                 ims.sellProduct(name, quantity);
                 break;
-            case 6:
+            case 5:
                 cout << "输入要更新价格的产品名:";
                 cin >> name;
                 cout << "输入新价格:";
                 cin >> price;
                 ims.updatePrice(name, price);
                 break;
-            case 7:
+            case 6:
                 cout << "已退出程序...\n"<< endl;
 				exit(0);
-            default:
-                cout << "没有这个选项" << endl;
-                break;
         }
-		getchar();
-		getchar();
     } while (choice != 7);
 
     return 0;
 }
+#ifdef __linux__
+int getch(void)
+{
+     struct termios tm, tm_old;
+     int fd = 0, ch;
+
+     if (tcgetattr(fd, &tm) < 0) {//保存现在的终端设置
+          return -1;
+     }
+
+     tm_old = tm;
+     cfmakeraw(&tm);//更改终端设置为原始模式，该模式下所有的输入数据以字节为单位被处理
+     if (tcsetattr(fd, TCSANOW, &tm) < 0) {//设置上更改之后的设置
+          return -1;
+     }
+
+     ch = getchar();
+     if (tcsetattr(fd, TCSANOW, &tm_old) < 0) {//更改设置为最初的样子
+          return -1;
+     }
+
+     return ch;
+}
+#endif

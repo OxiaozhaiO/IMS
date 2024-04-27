@@ -173,7 +173,7 @@ int main()
     do {
 /*	
  *	这边用宏判断是linux还是windows
- *	我这边用的是linux
+ *	我这边用的是linux系统
 */
 #ifdef _WIN32
 		system("cls");

@@ -163,6 +163,52 @@ public:
             temp.pop();
         }
     }
+	void exportInventory(const string& filename) 
+	{
+        FILE* file = fopen(filename.c_str(), "w");
+        if (file == nullptr) 
+		{
+            cerr << "程序错误,无法保存" << endl;
+            return;
+        }
+
+        stack<Product> temp;
+        while (!inventory.empty()) 
+		{
+            Product product = inventory.top();
+            inventory.pop();
+            fprintf(file, "%s,%s,%s,%d,%.2f\n", product.name.c_str(), product.category.c_str(),
+                    product.label.c_str(), product.quantity, product.price);
+            temp.push(product);
+        }
+
+        while (!temp.empty()) {
+            inventory.push(temp.top());
+            temp.pop();
+        }
+
+        fclose(file);
+        cout << "已导出为" << filename << endl;
+		getchar();
+    }
+	void importInventory(const string& filename) {
+        FILE* file = fopen(filename.c_str(), "r");
+        if (file == nullptr) {
+            return;
+        }
+
+        char name[100], category[100], label[100];
+		string sname, scategory, slabel;
+        int quantity;
+        double price;
+        while (fscanf(file, "%[^,],%[^,],%[^,],%d,%lf\n", name, category, label, &quantity, &price) != EOF) 
+		{
+			sname = name; scategory = category; slabel = label;
+            inventory.push(Product(sname, scategory, slabel, quantity, price));
+        }
+
+        fclose(file);
+    }
 };
 //打印主菜单
 void printMenu() 
@@ -173,7 +219,8 @@ void printMenu()
     cout<<"      "<<(nav==3?"*":" ")<<"购买产品"<<endl;
     cout<<"      "<<(nav==4?"*":" ")<<"售出产品"<<endl;
     cout<<"      "<<(nav==5?"*":" ")<<"更新价格"<<endl;
-    cout<<"      "<<(nav==6?"*":" ")<<"退出"<<endl;
+    cout<<"      "<<(nav==6?"*":" ")<<"导出信息"<<endl;
+    cout<<"      "<<(nav==7?"*":" ")<<"退出"<<endl;
 	cout<<"(w或s移动，空格进入模块)"<<endl;
     cout<<"========================"<<endl;
 }
@@ -185,6 +232,8 @@ int main()
     string name, category, label;
     int quantity;
     double price;
+	ims.importInventory("product.info");
+
     do{
 /*	
  *	这边用宏判断是linux还是windows
@@ -198,8 +247,8 @@ int main()
         printMenu();
 		ims.displayInventory();
 		char ch = getch();
-		if(ch == 'w') nav = nav-1 == 0? 6:nav-1;
-		else if(ch == 's') nav = nav+1 == 7? 1:nav+1;
+		if(ch == 'w') nav = nav-1 == 0? 7:nav-1;
+		else if(ch == 's') nav = nav+1 == 8? 1:nav+1;
 		if(ch == ' ')
         switch(nav)
 	   	{
@@ -242,7 +291,10 @@ int main()
                 cin>>price;
                 ims.updatePrice(name, price);
                 break;
-            case 6:
+			case 6:
+				ims.exportInventory("product.info");
+				break;
+            case 7:
                 cout<<"已退出程序..."<<endl;
 				exit(0);
         }

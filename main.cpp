@@ -166,47 +166,45 @@ public:
 	void exportInventory(const string& filename) 
 	{
         FILE* file = fopen(filename.c_str(), "w");
-        if (file == nullptr) 
+        if(file == nullptr) 
 		{
-            cerr << "程序错误,无法保存" << endl;
+            cout<<"程序错误,无法保存"<<endl;
             return;
         }
 
         stack<Product> temp;
-        while (!inventory.empty()) 
+        while(!inventory.empty()) 
 		{
             Product product = inventory.top();
             inventory.pop();
-            fprintf(file, "%s,%s,%s,%d,%.2f\n", product.name.c_str(), product.category.c_str(),
-                    product.label.c_str(), product.quantity, product.price);
+            fprintf(file, "%s,%s,%s,%d,%.2f\n", product.name.c_str(), product.category.c_str(), product.label.c_str(), product.quantity, product.price);
             temp.push(product);
         }
 
-        while (!temp.empty()) {
+        while(!temp.empty()) 
+		{
             inventory.push(temp.top());
             temp.pop();
         }
 
         fclose(file);
-        cout << "已导出为" << filename << endl;
+        cout<<"已导出为"<<filename<<endl;
 		getchar();
     }
-	void importInventory(const string& filename) {
+	void importInventory(const string& filename) 
+	{
         FILE* file = fopen(filename.c_str(), "r");
-        if (file == nullptr) {
-            return;
-        }
+        if(file == nullptr) return;
 
         char name[100], category[100], label[100];
 		string sname, scategory, slabel;
         int quantity;
         double price;
-        while (fscanf(file, "%[^,],%[^,],%[^,],%d,%lf\n", name, category, label, &quantity, &price) != EOF) 
+        while(fscanf(file, "%[^,],%[^,],%[^,],%d,%lf\n", name, category, label, &quantity, &price) != EOF) 
 		{
 			sname = name; scategory = category; slabel = label;
             inventory.push(Product(sname, scategory, slabel, quantity, price));
         }
-
         fclose(file);
     }
 };

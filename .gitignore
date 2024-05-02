@@ -1,3 +1,4 @@
 token
 *.o
 ims
+*.info

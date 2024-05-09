@@ -1,7 +1,3 @@
-/*
- * 此项目已在Github开源
- * 项目地址:https://github.com/OxiaozhaiO/IMS
- */
 #include<iostream>
 #include<stack>
 #include<string>
@@ -16,7 +12,6 @@
 #ifdef __linux__
 #include<unistd.h>
 #include<termio.h>
-#include<fcntl.h>
 int getch();
 
 #elif _WIN32
@@ -37,177 +32,176 @@ struct Product
     Product(string& n, string& c, string& l, int q, double p):name(n), category(c), label(l), quantity(q), price(p) {}
 };
 
-class IMS
+//用栈将库存保存起来（非常的形象生动）
+stack<Product> inventory;
+//添加产品函数
+void addProduct(string& name, string& category, string& label, int quantity, double price) 
 {
-private:
-	//用栈将库存保存起来（非常的形象生动）
-    stack<Product> inventory;
-public:
-	//添加产品函数
-    void addProduct(string& name, string& category, string& label, int quantity, double price) 
-	{
-        inventory.push(Product(name, category, label, quantity, price));
-        cout<<"添加了: "<<name<<endl;
-    }
+	inventory.push(Product(name, category, label, quantity, price));
+    cout<<"添加了: "<<name<<endl;
+	getchar();
+	getchar();
+}
 	//删除产品函数
-    void removeProduct(string& name) 
+void removeProduct(string& name) 
+{
+	bool flag = false;
+    stack<Product> temp;//遍历栈需要pop, 所以防止数据丢失建立temp栈保存
+    while(!inventory.empty()) 
 	{
-        stack<Product> temp;//遍历栈需要pop, 所以防止数据丢失建立temp栈保存
-        while(!inventory.empty()) 
-		{
-            Product product = inventory.top();
-            inventory.pop();
-            if(product.name != name) temp.push(product);
-			else cout<<"已删除: "<<name<<endl;
-        }
-        while(!temp.empty()) //将数据放回原栈
-		{
-            inventory.push(temp.top());
-            temp.pop();
-        }
+       	Product product = inventory.top();
+        inventory.pop();
+        if(product.name != name) temp.push(product);
+		else cout<<"已删除: "<<name<<endl, flag = true;
     }
-	//显示库存函数
-    void displayInventory() 
+    while(!temp.empty()) //将数据放回原栈
 	{
-        cout<<"当前库存:"<<endl;
-		if(inventory.empty())cout<<"-----------\n";
-		else cout<<"==\n";
+    	inventory.push(temp.top());
+        temp.pop();
+    }
+	if(flag) getchar(), getchar();
+}
+//显示库存函数
+void displayInventory() 
+{
+	cout<<"当前库存:"<<endl;
+	if(inventory.empty())cout<<"-----------\n";
+	else cout<<"==\n";
 
-        stack<Product> temp;//建立temp栈保存数据
-        while(!inventory.empty()) 
+    stack<Product> temp;//建立temp栈保存数据
+    while(!inventory.empty()) 
+	{
+    	Product product = inventory.top();
+        inventory.pop();
+        cout<<"名字: "<<product.name<<", 类别: "<<product.category
+            <<", 标签: "<<product.label<<", 数量: "<<product.quantity
+            <<", 价格: "<<product.price<<endl;
+        temp.push(product);
+    }
+    while(!temp.empty()) //放回原栈中
+	{
+    	inventory.push(temp.top());
+        temp.pop();
+    }
+	if(!inventory.empty()) cout<<"==\n";
+}
+//购买产品到库函数
+void purchaseProduct(string& name, int quantity) 
+{
+	stack<Product> temp;
+    while(!inventory.empty()) 
+	{
+        Product product = inventory.top();
+        inventory.pop();
+        if(product.name == name) 
 		{
-            Product product = inventory.top();
-            inventory.pop();
-            cout<<"名字: "<<product.name<<", 类别: "<<product.category
-                 <<", 标签: "<<product.label<<", 数量: "<<product.quantity
-                 <<", 价格: "<<product.price<<endl;
+        	product.quantity += quantity;
             temp.push(product);
-
-        }
-        while(!temp.empty()) //放回原栈中
-		{
-            inventory.push(temp.top());
-            temp.pop();
-        }
-		if(!inventory.empty()) cout<<"==\n";
-    }
-	//购买产品到库函数
-    void purchaseProduct(string& name, int quantity) 
+            cout<<"购买了"<<quantity<<"个"<<name<<endl;
+        } else temp.push(product); 
+     }
+    while(!temp.empty()) 
 	{
-        stack<Product> temp;
-        while(!inventory.empty()) 
-		{
-            Product product = inventory.top();
-            inventory.pop();
-            if(product.name == name) 
-			{
-                product.quantity += quantity;
-                temp.push(product);
-                cout<<"购买了"<<quantity<<"个"<<name<<endl;
-            } else temp.push(product); 
-        }
-
-        while(!temp.empty()) 
-		{
-            inventory.push(temp.top());
-            temp.pop();
-        }
+    	inventory.push(temp.top());
+        temp.pop();
     }
+	getchar();
+	getchar();
+}
 	//产品售出函数
-    void sellProduct(string& name, int quantity) 
+void sellProduct(string& name, int quantity) 
+{
+	stack<Product> temp;
+	while(!inventory.empty()) 
 	{
-        stack<Product> temp;
-        while(!inventory.empty()) 
+		Product product = inventory.top();
+		inventory.pop();
+		if(product.name == name) 
 		{
-            Product product = inventory.top();
-            inventory.pop();
-            if(product.name == name) 
+			if(product.quantity < quantity) 
 			{
-                if(product.quantity < quantity) 
-				{
-                    cout<<name<<" 数量不足!"<<endl;
-                    temp.push(product);
-                    break;
-                }
-                product.quantity -= quantity;
-                temp.push(product);
-                cout<<"已出售"<<quantity<<"个"<<name<<endl;
-            } else temp.push(product);
-        }
-
-        while(!temp.empty()) 
-		{
-            inventory.push(temp.top());
-            temp.pop();
-        }
-    }
+				cout<<name<<" 数量不足!"<<endl;
+				temp.push(product);
+				break;
+			}
+			product.quantity -= quantity;
+			temp.push(product);
+			cout<<"已出售"<<quantity<<"个"<<name<<endl;
+		} else temp.push(product);
+	}
+	while(!temp.empty()) 
+	{
+		inventory.push(temp.top());
+		temp.pop();
+	}
+	getchar();
+	getchar();
+}
 	//更新价格函数
-    void updatePrice(string& name, double price) 
+void updatePrice(string& name, double price) 
+{
+	stack<Product> temp;
+	while(!inventory.empty()) 
 	{
-        stack<Product> temp;
-        while(!inventory.empty()) 
+		Product product = inventory.top();
+		inventory.pop();
+		if(product.name == name) 
 		{
-            Product product = inventory.top();
-            inventory.pop();
-            if(product.name == name) 
-			{
-                product.price = price;
-                temp.push(product);
-                cout<<name<<" 的价格已改为"<<price<<endl;
-            }else temp.push(product);
-        }
-
-        while(!temp.empty()) 
-		{
-            inventory.push(temp.top());
-            temp.pop();
-        }
-    }
-	void exportInventory(const string& filename) 
+			product.price = price;
+			temp.push(product);
+			cout<<name<<" 的价格已改为"<<price<<endl;
+		}else temp.push(product);
+	}
+	while(!temp.empty()) 
 	{
-        FILE* file = fopen(filename.c_str(), "w");
-        if(file == nullptr) 
-		{
-            cout<<"程序错误,无法保存"<<endl;
-            return;
-        }
-
-        stack<Product> temp;
-        while(!inventory.empty()) 
-		{
-            Product product = inventory.top();
-            inventory.pop();
-            fprintf(file, "%s,%s,%s,%d,%.2f\n", product.name.c_str(), product.category.c_str(), product.label.c_str(), product.quantity, product.price);
-            temp.push(product);
-        }
-
-        while(!temp.empty()) 
-		{
-            inventory.push(temp.top());
-            temp.pop();
-        }
-
-        fclose(file);
-        cout<<"已导出为"<<filename<<endl;
-		getchar();
-    }
-	void importInventory(const string& filename) 
+		inventory.push(temp.top());
+		temp.pop();
+	}
+	getchar();
+	getchar();
+}
+void exportInventory(const string& filename) 
+{
+	FILE* file = fopen(filename.c_str(), "w");
+	if(file == nullptr) 
 	{
-        FILE* file = fopen(filename.c_str(), "r");
-        if(file == nullptr) return;
+		cout<<"程序错误,无法保存"<<endl;
+		return;
+	}
+	stack<Product> temp;
+	while(!inventory.empty()) 
+	{
+		Product product = inventory.top();
+		inventory.pop();
+		fprintf(file, "%s,%s,%s,%d,%.2f\n", product.name.c_str(), product.category.c_str(), product.label.c_str(), product.quantity, product.price);
+		temp.push(product);
+	}
+	while(!temp.empty()) 
+	{
+		inventory.push(temp.top());
+		temp.pop();
+	}
+	fclose(file);
+	cout<<"已导出为"<<filename<<endl;
+	sleep(1);
+}
+void importInventory(const string& filename) 
+{
+	FILE* file = fopen(filename.c_str(), "r");
+	if(file == nullptr) return;
 
-        char name[100], category[100], label[100];
-		string sname, scategory, slabel;
-        int quantity;
-        double price;
-        while(fscanf(file, "%[^,],%[^,],%[^,],%d,%lf\n", name, category, label, &quantity, &price) != EOF) 
-		{
-			sname = name; scategory = category; slabel = label;
-            inventory.push(Product(sname, scategory, slabel, quantity, price));
-        }
-        fclose(file);
-    }
-};
+	char name[100], category[100], label[100];
+	string sname, scategory, slabel;
+	int quantity;
+	double price;
+
+	while(fscanf(file, "%[^,],%[^,],%[^,],%d,%lf\n", name, category, label, &quantity, &price) != EOF) 
+	{
+		sname = name; scategory = category; slabel = label;
+		inventory.push(Product(sname, scategory, slabel, quantity, price));
+	}
+	fclose(file);
+}
 //打印主菜单
 void printMenu() 
 {
@@ -225,12 +219,13 @@ void printMenu()
 
 int main() 
 {
-    IMS ims;
+   // IMS ims;
     int choice;
     string name, category, label;
     int quantity;
     double price;
-	ims.importInventory("product.info");
+	//ims.
+	importInventory("product.info");
 
     do{
 /*	
@@ -243,7 +238,7 @@ int main()
 		system("clear");
 #endif
         printMenu();
-		ims.displayInventory();
+		displayInventory();
 		char ch = getch();
 		if(ch == 'w') nav = nav-1 == 0? 7:nav-1;
 		else if(ch == 's') nav = nav+1 == 8? 1:nav+1;
@@ -251,46 +246,34 @@ int main()
         switch(nav)
 	   	{
             case 1:
-                cout<<"输入产品名:";
-                cin>>name;
-                cout<<"输入产品类别:";
-                cin>>category;
-                cout<<"输入产品标签:";
-                cin>>label;
-                cout<<"输入产品数量: ";
-                cin>>quantity;
-                cout<<"输入产品价格:";
-                cin>>price;
-                ims.addProduct(name, category, label, quantity, price);
+                cout<<"输入产品名:";    cin>>name;
+                cout<<"输入产品类别:";  cin>>category;
+                cout<<"输入产品标签:";  cin>>label;
+                cout<<"输入产品数量: "; cin>>quantity;
+                cout<<"输入产品价格:";  cin>>price;
+				addProduct(name, category, label, quantity, price);
                 break;
             case 2:
-                cout<<"输入删除的产品名:";
-                cin>>name;
-                ims.removeProduct(name);
+                cout<<"输入删除的产品名:"; cin>>name;
+				removeProduct(name);
                 break;
             case 3:
-                cout<<"输入要购买的产品:";
-                cin>>name;
-                cout<<"输入购买数量: ";
-                cin>>quantity;
-                ims.purchaseProduct(name, quantity);
+                cout<<"输入要购买的产品:"; cin>>name;
+                cout<<"输入购买数量: ";    cin>>quantity;
+				purchaseProduct(name, quantity);
                 break;
             case 4:
-                cout<<"输入出售的产品:";
-                cin>>name;
-                cout<<"输入出售数量:";
-                cin>>quantity;
-                ims.sellProduct(name, quantity);
+                cout<<"输入出售的产品:"; cin>>name;
+                cout<<"输入出售数量:";   cin>>quantity;
+				sellProduct(name, quantity);
                 break;
             case 5:
-                cout<<"输入要更新价格的产品名:";
-                cin>>name;
-                cout<<"输入新价格:";
-                cin>>price;
-                ims.updatePrice(name, price);
+                cout<<"输入要更新价格的产品名:"; cin>>name;
+                cout<<"输入新价格:";             cin>>price;
+				updatePrice(name, price);
                 break;
 			case 6:
-				ims.exportInventory("product.info");
+				exportInventory("product.info");
 				break;
             case 7:
                 cout<<"已退出程序..."<<endl;

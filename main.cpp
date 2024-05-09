@@ -20,7 +20,7 @@ int getch();
 #endif
 
 using namespace std;
-int nav = 1;
+int nav = 1;//模块选择数
 
 struct Product 
 {
@@ -51,6 +51,8 @@ void removeProduct(string& name)
 	{
        	Product product = inventory.top();
         inventory.pop();
+
+		//如果找到产品，则不将其数据push到temp中
         if(product.name != name) temp.push(product);
 		else cout<<"已删除: "<<name<<endl, flag = true;
     }
@@ -194,7 +196,7 @@ void importInventory(const string& filename)
 	string sname, scategory, slabel;
 	int quantity;
 	double price;
-
+					// 以逗号为间隔读取数据
 	while(fscanf(file, "%[^,],%[^,],%[^,],%d,%lf\n", name, category, label, &quantity, &price) != EOF) 
 	{
 		sname = name; scategory = category; slabel = label;

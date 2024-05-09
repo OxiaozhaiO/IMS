@@ -219,12 +219,10 @@ void printMenu()
 
 int main() 
 {
-   // IMS ims;
     int choice;
     string name, category, label;
     int quantity;
     double price;
-	//ims.
 	importInventory("product.info");
 
     do{
